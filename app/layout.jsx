@@ -1,6 +1,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
+import { aj } from "@/lib/arcjet";
+import { request } from "@arcjet/next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 
@@ -11,7 +13,24 @@ export const metadata = {
   description: "One stop Finance Platform",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // Arcjet protection
+  const req = await request();
+  const decision = await aj.protect(req);
+
+  if (decision.isDenied()) {
+    return (
+      <html lang="en">
+        <body>
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            <h1>Access Denied</h1>
+            <p>Your request was blocked by our security policies.</p>
+          </div>
+        </body>
+      </html>
+    );
+  }
+
   return (
     <ClerkProvider>
       <html lang="en">

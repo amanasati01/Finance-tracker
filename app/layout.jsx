@@ -14,21 +14,28 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  // Arcjet protection
-  const req = await request();
-  const decision = await aj.protect(req);
+  // Arcjet protection — fail-open if key is missing or request errors
+  if (process.env.ARCJET_KEY) {
+    try {
+      const req = await request();
+      const decision = await aj.protect(req);
 
-  if (decision.isDenied()) {
-    return (
-      <html lang="en">
-        <body>
-          <div style={{ padding: "2rem", textAlign: "center" }}>
-            <h1>Access Denied</h1>
-            <p>Your request was blocked by our security policies.</p>
-          </div>
-        </body>
-      </html>
-    );
+      if (decision.isDenied()) {
+        return (
+          <html lang="en">
+            <body>
+              <div style={{ padding: "2rem", textAlign: "center" }}>
+                <h1>Access Denied</h1>
+                <p>Your request was blocked by our security policies.</p>
+              </div>
+            </body>
+          </html>
+        );
+      }
+    } catch (e) {
+      // Arcjet unavailable — allow request to continue
+      console.warn("[Arcjet] Protection skipped:", e?.message);
+    }
   }
 
   return (

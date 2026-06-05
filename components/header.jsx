@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { PenBox, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { checkUser } from "@/lib/checkUser";
 import Image from "next/image";
 
@@ -24,7 +24,7 @@ const Header = async () => {
 
         {/* Navigation Links - Different for signed in/out users */}
         <div className="hidden md:flex items-center space-x-8">
-          <SignedOut>
+          <Show when="signed-out">
             <a href="#features" className="text-gray-600 hover:text-blue-600">
               Features
             </a>
@@ -34,12 +34,12 @@ const Header = async () => {
             >
               Testimonials
             </a>
-          </SignedOut>
+          </Show>
         </div>
 
      
         <div className="flex items-center space-x-4">
-          <SignedIn>
+          <Show when="signed-in">
             <Link
               href="/dashboard"
               className="text-gray-600 hover:text-blue-600 flex items-center gap-2"
@@ -55,13 +55,13 @@ const Header = async () => {
                 <span className="hidden md:inline">Add Transaction</span>
               </Button>
             </a>
-          </SignedIn>
-          <SignedOut>
+          </Show>
+          <Show when="signed-out">
             <SignInButton forceRedirectUrl="/dashboard">
               <Button variant="outline">Login</Button>
             </SignInButton>
-          </SignedOut>
-          <SignedIn>
+          </Show>
+          <Show when="signed-in">
             <UserButton
               appearance={{
                 elements: {
@@ -69,7 +69,7 @@ const Header = async () => {
                 },
               }}
             />
-          </SignedIn>
+          </Show>
         </div>
       </nav>
     </header>
